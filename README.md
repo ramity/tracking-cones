@@ -4,7 +4,7 @@
 
 A possibly misguided attempt at a camera positioning system using 3D printing, Blender, and Python.
 
-![alt text](docs/220-cone-contours.gif)
+![alt text](docs/120-cone-contours.gif)
 
 ## Setup
 
@@ -20,10 +20,16 @@ docker exec -it tracking_server bash
 blender --background --script renderer.py
 ```
 
+Perform contour and ellipse fitting:
+```bash
+docker exec -it tracking_server bash
+python3 eclipse.py 
+```
+
 Convert the renders to a GIF:
 ```bash
 docker exec -it tracking_server bash
-python renders-to-gif.py
+python3 renders-to-gif.py
 ```
 
 ## Idea sketches
