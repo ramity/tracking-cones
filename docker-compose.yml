@@ -1,0 +1,17 @@
+services:
+  tracking_server:
+    build:
+      context: .
+      dockerfile: docker/server/Dockerfile
+    container_name: tracking_server
+    image: tracking_server
+    volumes:
+      - ./src:/app
+      - ./data:/data
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: 1
