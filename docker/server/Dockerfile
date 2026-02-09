@@ -57,4 +57,6 @@ RUN cd /root/opencv/build && cmake -DWITH_FFMPEG=1 -DOPENCV_EXTRA_MODULES_PATH=.
 RUN cd /root/opencv/build && make -j$(nproc)
 RUN cd /root/opencv/build && make install
 
+RUN pip install matplotlib
+
 ENTRYPOINT sleep infinity

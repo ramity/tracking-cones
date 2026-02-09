@@ -12,13 +12,14 @@ import os
 # render_68 = '/data/renders/render_68_110_0.00_-41.21_101.99_0.37_0.93_0.00_1.00_0.00_1.00.png'
 # img = cv2.imread(render_60)
 
-render_directory = '/data/renders_120/'
+render_directory = '/data/renders_400/'
 
 # For each render
 for i, render in enumerate(os.listdir(render_directory)):
     img = cv2.imread(os.path.join(render_directory, render))
+    original = img.copy()
 
-    output_file = '/data/contours_120/' + render
+    output_file = '/data/contours_400/' + render
 
     # Extract contours from image.
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -113,26 +114,26 @@ for i, render in enumerate(os.listdir(render_directory)):
 
     # print(right_most_x)
 
-    # Get left most countours
+    # Get left most countours.
     left_most_contours = [c for c in left_canidates if c[0, 0] == left_most_x]
 
-    # Get right most countours
+    # Get right most countours.
     right_most_contours = [c for c in right_canidates if c[0, 0] == right_most_x]
 
-    # Draw left most countours
+    # Draw left most countours.
     cv2.drawContours(img, left_most_contours, -1, (0, 255, 0), 1)
 
-    # Draw right most countours
+    # Draw right most countours.
     cv2.drawContours(img, right_most_contours, -1, (0, 255, 0), 1)
     cv2.imwrite(output_file, img)
 
     # print(left_most_contours)
     # print(right_most_contours)
 
-    # Get y center of left most countours
+    # Get y center of left most countours.
     left_most_y_center = (np.mean([c[0, 1] for c in left_most_contours]))
 
-    # Get y center of right most countours
+    # Get y center of right most countours.
     right_most_y_center = (np.mean([c[0, 1] for c in right_most_contours]))
 
     # print(left_most_y_center)
@@ -141,7 +142,7 @@ for i, render in enumerate(os.listdir(render_directory)):
     base_left = (left_most_x, left_most_y_center)
     base_right = (right_most_x, right_most_y_center)
 
-    # Draw a line from left_most_x, left_most_y_center to right_most_x, right_most_y_center
+    # Draw a line from left_most_x, left_most_y_center to right_most_x, right_most_y_center.
     cv2.line(img, np.int32(base_left), np.int32(base_right), (0, 255, 0), 1)
     cv2.imwrite(output_file, img)
 
@@ -150,22 +151,22 @@ for i, render in enumerate(os.listdir(render_directory)):
     base_center_y = ((left_most_y_center + right_most_y_center) / 2)
     base_center = (base_center_x, base_center_y)
 
-    # Calculate the center of the left and right tips
+    # Calculate the center of the left and right tips.
     tip_center_x = ((left_tip[0, 0] + right_tip[0, 0]) / 2)
     tip_center_y = ((left_tip[0, 1] + right_tip[0, 1]) / 2)
     tip_center = (tip_center_x, tip_center_y)
 
-    # Draw a line from the base_center to center_tip
+    # Draw a line from the base_center to center_tip.
     cv2.line(img, np.int32(base_center), np.int32(tip_center), (0, 255, 0), 1)
     cv2.imwrite(output_file, img)
 
-    # Calculate the angle of the line
+    # Calculate the angle of the line.
     base_center_line_rad = math.atan2(tip_center_y - base_center_y, tip_center_x - base_center_x)
 
-    # Calculate the slope between left_tip and base_left
+    # Calculate the slope between left_tip and base_left.
     base_left_slope = (left_tip[0, 1] - base_left[1]) / (left_tip[0, 0] - base_left[0])
 
-    # Calculate the slope between right_tip and base_right
+    # Calculate the slope between right_tip and base_right.
     base_right_slope = (right_tip[0, 1] - base_right[1]) / (right_tip[0, 0] - base_right[0])
 
     # print(base_left_slope)
@@ -201,15 +202,15 @@ for i, render in enumerate(os.listdir(render_directory)):
     cv2.drawContours(img, [right_most_bottom_contour], -1, (0, 255, 0), 1)
     cv2.imwrite(output_file, img)
 
-    # Get x center between left_most_bottom_contour and right_most_bottom_contour
+    # Get x center between left_most_bottom_contour and right_most_bottom_contour.
     bottom_center_x = ((left_most_bottom_contour[0, 0] + right_most_bottom_contour[0, 0]) / 2)
     bottom_center = (bottom_center_x, bottom_y)
 
-    # Draw a line from the base_center to tip_center
+    # Draw a line from the base_center to tip_center.
     cv2.line(img, np.int32(base_center), np.int32(tip_center), (0, 255, 0), 1)
     cv2.imwrite(output_file, img)
 
-    # Draw a line from the base_center to bottom_center
+    # Draw a line from the base_center to bottom_center.
     cv2.line(img, np.int32(base_center), np.int32(bottom_center), (0, 255, 0), 1)
     cv2.imwrite(output_file, img)
 
@@ -217,7 +218,7 @@ for i, render in enumerate(os.listdir(render_directory)):
     # - the base_center as the center
     # - its distance to the bottom_center as the minor axis.
     # - base_left to base_right as the major axis.
-    axes = (abs(base_left[0] - base_center[0]), abs(bottom_center[1] - base_center[1]))
+    axes = (abs(base_center[0] - base_left[0]), abs(base_center[1] - bottom_center[1]))
     cv2.ellipse(img, np.int32(base_center), np.int32(axes), 0, 0, 360, (0, 255, 0), 1)
     cv2.imwrite(output_file, img)
 
@@ -226,18 +227,30 @@ for i, render in enumerate(os.listdir(render_directory)):
     known_width = 20
     sensor_width = 36
     render_width = 1920
+    known_distance = 400
 
-    # Get base distance between points base_left and base_right
+    # Get base distance between points base_left and base_right.
     base_distance = math.sqrt((base_left[0] - base_right[0]) ** 2 + (base_left[1] - base_right[1]) ** 2)
     # print(base_distance)
 
     # Calculate the distance from the camera to the cone.
     distance = (known_width * focal_length) / ((base_distance / render_width) * sensor_width)
     angle_to_cone = math.degrees(math.asin(axes[1] / axes[0]))
-    distance_error = f"{((abs(distance - 120) / 120) * 100):.2f}%"
+    distance_error = f"{((abs(distance - known_distance) / known_distance) * 100):.2f}%"
 
     if i:
         angle_error = f"{((abs(angle_to_cone - i) / i) * 100):.2f}%"
     else:
         angle_error = f"{abs(angle_to_cone):.2f}%"
-    print(i, distance, angle_to_cone, distance_error, angle_error)
+
+    # Calculate distance from tip to base
+    tip_to_base_distance = math.sqrt((tip_center[0] - base_center[0]) ** 2 + (tip_center[1] - base_center[1]) ** 2)
+    # print(i, distance, angle_to_cone, tip_to_base_distance, tip_to_base_distance / base_distance)
+
+    # Calculate the number of white pixels in the image.
+    white_pixels = np.sum(original > 0)
+    white_pixels_percentage = white_pixels / (original.shape[0] * original.shape[1]) * 100
+    min_percentage = 25.902922453703702
+    max_percentage = 26.421006944444443
+    normalized_white_pixels = (white_pixels_percentage - min_percentage) / (max_percentage - min_percentage)
+    print(i, white_pixels, normalized_white_pixels)

@@ -22,10 +22,10 @@ def enable_gpus():
         bg_node.inputs[0].default_value = (0, 0, 0, 1)
 
 # --- CONSTANTS ---
-DISTANCE = 120
+DISTANCE = 400
 POSES = []
 STL_PATH = "/data/20mm Tracking Cone.stl"
-OUTPUT_DIR = "/data/renders_120"
+OUTPUT_DIR = "/data/renders_400"
 
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
@@ -56,6 +56,7 @@ def setup_scene():
 def create_camera():
     bpy.ops.object.camera_add()
     cam = bpy.context.active_object
+    cam.data.clip_end = 2020
     bpy.context.scene.camera = cam
     # Ensure camera is focused on origin
     return cam
