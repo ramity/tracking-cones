@@ -293,6 +293,64 @@ ax10.grid(True, linestyle="--", alpha=0.6)
 # Save the figure.
 plt.savefig("/data/line_chart_by_distance.png")
 
+## Revisiting cropping/clipping complete graph by limiting and clip_on
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection="3d")
+
+# Plot the 3D surface @ 60000 pixels.
+# x = np.linspace(0, 90, 100)
+# y = np.linspace(105, 205, 100)
+# x, y = np.meshgrid(x, y)
+# Z = np.linspace(60000, 60000, 100).reshape(1, -1)
+# Z = np.repeat(Z, 100, axis=0)
+# ax.plot_surface(x, y, Z, alpha=1, color="black")
+
+for dist in reversed(unique_distances):
+    # Filter the data for the current distance series
+    mask = (data_distance == dist) & (data_area >= 60000) & (data_area <= 80000)
+
+    # Extract and sort values by angle to ensure lines connect properly
+    x_values = data_angle[mask]
+    y_values = data_area[mask]
+
+    if x_values.size == 0 or y_values.size == 0:
+        continue
+
+    # Plot the specific series
+    ax.scatter(x_values, dist * np.ones(len(x_values)), y_values, label=f"Distance: {dist}", marker="o", s=2)
+
+ax.set_xlabel("Angle (theta in degrees)", fontsize=12)
+ax.set_ylabel("Distance (mm)", fontsize=12)
+ax.set_zlabel("Pixels", fontsize=12)
+ax.grid(True, linestyle="-", alpha=1)
+ax.set_xlim([0, 67])
+ax.set_ylim([135, 188])
+ax.set_zlim([60000, 80000])
+
+ax.view_init(elev=15, azim=-45)
+plt.savefig("/data/3d_surface_by_distance_slice_limited.png")
+
+ax.view_init(elev=0, azim=0)
+plt.savefig("/data/3d_surface_by_distance_slice_limited_0.png")
+
+ax.view_init(elev=0, azim=-90)
+plt.savefig("/data/3d_surface_by_distance_slice_limited_-90.png")
+
+# Rotate the camera around the surface and save images.
+frame = 0
+for i in range(-1, -90, -1):
+    ax.view_init(elev=30, azim=i)
+    plt.savefig(f"/data/3d_surface_by_distance_slice_limited/{frame:03d}.png")
+    frame += 1
+for i in range(-89, 0, 1):
+    ax.view_init(elev=30, azim=i)
+    plt.savefig(f"/data/3d_surface_by_distance_slice_limited/{frame:03d}.png")
+    frame += 1
+
+import sys
+sys.exit(1)
+
 # Plot the 3D surface created by the LoBF curves.
 fig = plt.figure()
 ax = fig.add_subplot(111, projection="3d")

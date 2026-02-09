@@ -28,13 +28,22 @@ Ability to:
 
 ---
 
-The crosssectional area of the cone is proportional to the angle of the camera relative to the base of the cone. As the angle increases, the crosssectional area decreases until 45 degrees. Crosssectional area shrinks with angle increase as seen in the following charts.
+I learned that the cross-sectional area of the cone is proportional to the angle of the camera relative to the base of the cone. As the angle increases, the cross-sectional area decreases until 45 degrees. Cross-sectional area shrinks with angle increase as seen in the following charts.
 
 ![alt text](docs/line_chart_by_distance.png)
 
 ![alt text](docs/angle,distance,pixel-3d-graph.gif)
 
 ![alt text](docs/80k-2.5k-spread-slice.gif)
+
+![alt text](docs/3d_surface_by_distance_slice_0.png)
+![alt text](docs/3d_surface_by_distance_slice_-90.png)
+
+My research suggests that PnP would be a more robust solution for this problem, but I've continued this research out of curiosity.
+
+![alt text](/docs/area_dataset_subsection.gif)
+
+
 
 ## Setup
 

@@ -3,7 +3,7 @@ import glob
 
 # Find all PNG files in the current directory, sorted by name
 # You can change the path and extension as needed
-file_list = sorted(glob.glob('/data/3d_surface_animation_slice/*.png')) 
+file_list = sorted(glob.glob('/data/3d_surface_by_distance_slice_limited/*.png')) 
 
 # Create a list to store the image objects
 images = []
