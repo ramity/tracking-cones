@@ -43,7 +43,20 @@ My research suggests that PnP would be a more robust solution for this problem, 
 
 ![alt text](/docs/area_dataset_subsection.gif)
 
+## Interresting observations
 
+![alt text](docs/scatter_subset_-90.png)
+
+Showcases how pixel counts constrains distance. A pixel count of 70k ranges immediately constrains the distance to between 145mm to 175mm. It also 
+
+![alt text](docs/scatter_subset_0.png)
+![alt text](docs/3d_surface_scatter_b.gif)
+
+As distance increases, the pixel count ranges are less constrained.
+
+![alt text](docs/105-1005-angle-distance-pixels.gif)
+
+The dataset was expanded to cover distances 105mm to 1005mm, 900 distances, 67 angles, creating 61K+ data points of pixel counts.
 
 ## Setup
 

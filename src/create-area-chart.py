@@ -11,6 +11,32 @@ data_angle = data[:, 1]
 data_area = data[:, 2]
 unique_distances = np.unique(data_distance)
 
+# # Create the figure and axes.
+# fig, ax = plt.subplots(1, 1, figsize=(20, 20))
+
+# # Calculate the best fit line for distance vs pixels.
+# x_values = []
+# y_values = []
+# for dist in unique_distances:
+#     # Filter the data for the current distance series
+#     mask = (data_distance == dist) & (data_angle == 67)
+    
+#     # Extract and sort values by angle to ensure lines connect properly
+#     x_values.append(data_distance[mask][0])
+#     y_values.append(data_area[mask][0])
+
+# coefficients = np.polyfit(x_values, y_values, 2)
+# polynomial = np.poly1d(coefficients)
+
+# x_values = np.linspace(105, 1005, 100) 
+
+# # Plot the best fit line.
+# ax.plot(x_values, polynomial(x_values), color="red", linewidth=2)
+# plt.savefig("/data/area_chart.png")
+
+# import sys
+# sys.exit()
+
 # Create the figure and axes.
 fig, (ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8, ax9, ax10) = plt.subplots(10, 1, figsize=(20, 40))
 
@@ -347,9 +373,6 @@ for i in range(-89, 0, 1):
     ax.view_init(elev=30, azim=i)
     plt.savefig(f"/data/3d_surface_by_distance_slice_limited/{frame:03d}.png")
     frame += 1
-
-import sys
-sys.exit(1)
 
 # Plot the 3D surface created by the LoBF curves.
 fig = plt.figure()

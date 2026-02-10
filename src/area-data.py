@@ -12,7 +12,7 @@ IMAGE_SIZE = (IMAGE_WIDTH, IMAGE_HEIGHT)
 SENSOR_WIDTH = 36
 SENSOR_HEIGHT = 24
 ANGLES = range(0, 68, 1)
-DISTANCES = range(105, 206, 1)
+DISTANCES = range(105, 1006, 1)
 
 # Ensure clean slate
 bpy.ops.object.select_all(action="SELECT")
