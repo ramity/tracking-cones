@@ -236,7 +236,7 @@ for render_id, render in enumerate(renders):
     # plt.savefig("/data/test.png")
 
     plt.close(fig)
-    
+
     # import sys
     # sys.exit(0)
 
