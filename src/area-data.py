@@ -50,7 +50,7 @@ for distance in DISTANCES:
     for angle in ANGLES:
 
         # Check if file already exists.
-        filename = f"render_{distance:03d}_{angle:03d}.png"
+        filename = f"render_{distance:04d}_{angle:03d}.png"
         filepath = f"/data/renders/{filename}"
         if os.path.exists(filepath):
             continue

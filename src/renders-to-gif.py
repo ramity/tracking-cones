@@ -3,7 +3,7 @@ import glob
 
 # Find all PNG files in the current directory, sorted by name
 # You can change the path and extension as needed
-file_list = sorted(glob.glob('/data/area-pixel-count-spread-slice/*.png')) 
+file_list = sorted(glob.glob('/data/query-results/*.png')) 
 
 # Create a list to store the image objects
 images = []
@@ -15,11 +15,11 @@ for filename in file_list:
 # Save the first image, and append the rest as frames
 if images:
     images[0].save(
-        '/data/area-pixel-count-spread-slice-5000-pixels-100-spread.gif',
+        '/data/distance-bounds.gif',
         format='GIF',
         append_images=images[1:],
         save_all=True,
-        duration=50,
+        duration=100,
         loop=0,
         disposal=2
     )
