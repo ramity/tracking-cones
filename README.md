@@ -7,30 +7,30 @@
 # TOC
 
 - [I. Introduction](#i-introduction)
-  - [Background](#i-background)
-  - [Problem Statement](#i-problem-statement)
-  - [Proposed Solution](#i-proposed-solution)
-  - [Objectives](#i-objectives)
+  - [Background](#background)
+  - [Problem Statement](#problem-statement)
+  - [Proposed Solution](#proposed-solution)
+  - [Objectives](#objectives)
 - [II. Literature Review](#ii-literature-review)
-  - [Vision Based Navigation](#ii-vision-based-navigation)
-  - [Geometric Primitive Localization](#ii-geometric-primitive-localization)
-  - [PnP](#ii-pnp)
+  - [Vision Based Navigation](#vision-based-navigation)
+  - [Geometric Primitive Localization](#geometric-primitive-localization)
+  - [PnP](#pnp)
 - [III. Theoretical Framework & Mathematical Modeling](#iii-theoretical-framework--mathematical-modeling)
-  - [Conic Geometry in 3D Space](#iii-conic-geometry-in-3d-space)
-  - [The Camera Model](#iii-the-camera-model)
-  - [Image Segmentation](#iii-image-segmentation)
-  - [Pixel Count Analysis](#iii-pixel-count-analysis)
-  - [Angle Estimation](#iii-angle-estimation)
-  - [PNP Calculation](#iii-pnp-calculation)
+  - [Conic Geometry in 3D Space](#conic-geometry-in-3d-space)
+  - [The Camera Model](#the-camera-model)
+  - [Image Segmentation](#image-segmentation)
+  - [Pixel Count Analysis](#pixel-count-analysis)
+  - [Angle Estimation](#angle-estimation)
+  - [PNP Calculation](#pnp-calculation)
 - [IV. Implementation](#iv-implementation)
-  - [Pixel Count Dataset](#iv-pixel-count-dataset)
-  - [Pixel Count Query Approach](#iv-pixel-count-query-approach)
-  - [Working Theory](#iv-working-theory)
+  - [Pixel Count Dataset](#pixel-count-dataset)
+  - [Pixel Count Query Approach](#pixel-count-query-approach)
+  - [Working Theory](#working-theory)
 - [V. Results](#v-results)
-  - [Performance Analysis](#v-performance-analysis)
+  - [Performance Analysis](#performance-analysis)
 - [VI. Future Work](#vi-future-work)
 - [VII. Setup](#vii-setup)
-- [VIII. Idea sketches](#viii-idea-sketches)
+- [VIII. Ideas and stale visualizations](#viii-ideas-and-stale-visualizations)
 
 # I. Introduction
 
@@ -267,7 +267,7 @@ docker exec -it tracking_server bash
 python3 renders-to-gif.py
 ```
 
-# VIII. Idea and stale visualizations
+# VIII. Ideas and stale visualizations
 
 ![alt text](docs/3d_surface_by_distance_slice_0.png)
 ![alt text](docs/3d_surface_by_distance_slice_-90.png)
