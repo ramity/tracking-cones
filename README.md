@@ -19,7 +19,7 @@
 - [III. Theoretical Framework & Mathematical Modeling](#iii-theoretical-framework--mathematical-modeling)
   - [Conic Geometry in 3D Space](#conic-geometry-in-3d-space)
   - [The Camera Model](#the-camera-model)
-  - [Image Segmentation](#image-segmentation)
+  - [Cone Feature Extraction](#cone-feature-extraction)
   - [Pixel Count Analysis](#pixel-count-analysis)
   - [Angle Estimation](#angle-estimation)
   - [PNP Calculation](#pnp-calculation)
@@ -129,34 +129,51 @@ K = [
 
 Distance coefficient [1, 1, 1, 1]
 
-## Image Segmentation
+## Cone Feature Extraction
 
-Cone tip is the top most contour.
-Left most contour and right most contour are the base width of the cone.
-Center is midpoint between left and right of the base.
-Front is the bottom most contour.
+- The cone's apex is the top most contour.
+- The left most contour and right most contour define the base width of the cone.
+- The center is midpoint between left and right of the base.
+- The front is the bottom most contour.
+- The back is the point on the line between front and center, at a distance of r from the center.
 
 ## Pixel Count Analysis
 
 Pixels within the cone contour are counted.
 
+O(n) complexity.
+
 ## Angle Estimation
 
-Using the left, front, and right points, we can calculate the major and minor axes of the ellipse fit to the base of the cone.
+Using the front, left, right, and center points, we can calculate the major and minor axes of the ellipse fit to the base of the cone.
 
-This values also enable the calculate the angle of inclindation of the camera's tilt relative to the cone’s base.
+Taking the inverse sin of minor over major provides the inclination angle.
+
+This angle can also be described as the camera's z-axis tilt relative to the cone’s base.
 
 ## PNP Calculation
 
-3D values are provided for each of the 6 2D points
-- Top
-- Left
-- Right
-- Front
-- Back
-- Bottom
+2D points are extracted from the contours.
 
-And then combined to use the SOLVEPNP_ITERATIVE solver.
+(x, y)
+- top: lowest y value, center x value of the highest y value contours
+- left: lowest x value, center y value of the lowest x value contours
+- right: highest x value, center y value of the highest x value contours
+- center: midpoint between left and right
+- front: lowest y value, center x value of the lowest y value contours
+- back: slope between front and center is calculated and used to calculate the back point
+
+3D values are provided for each of the 6 2D points
+
+(x, y, z)
+- Top (0, 0, 20)
+- Left (-10, 0, 0)
+- Right (10, 0, 0)
+- Front (0, 10, 0)
+- Back (0, -10, 0)
+- Center (0, 0, 0)
+
+And then combined to use the cv2 provided solvePnP method using the SOLVEPNP_ITERATIVE solver.
 
 The results are used to calculate the distance and the angle of inclination of the camera relative to the cone.
 
@@ -199,7 +216,7 @@ Using the input angle, pixel count, pixel spread, and angle spread, the dataset 
 
 ![alt text](docs/input-query-chart-68-increment-zoom-4.gif)
 
-Here, we see the input and the decision space of the query. The inclination angle and tilt angle are shown in the top left. The pixel count is shown in the top right. The decision space is shown in the bottom left. The expected distance is shown in the bottom right.
+Here we see the input and a subset of the decision space considered for the query.
 
 # V. Results
 
