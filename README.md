@@ -6,6 +6,7 @@
 
 # TOC
 
+- [0. Foreword](#0-foreword)
 - [I. Introduction](#i-introduction)
   - [Background](#background)
   - [Problem Statement](#problem-statement)
@@ -31,6 +32,23 @@
 - [VI. Future Work](#vi-future-work)
 - [VII. Setup](#vii-setup)
 - [VIII. Ideas and stale visualizations](#viii-ideas-and-stale-visualizations)
+
+# 0. Foreword
+
+Cones are pretty neat.
+
+![cones-meme](docs/its-about-the-cones-parks-and-rec.gif)
+
+This novel approach explores using pixel count and the estimated angle of inclination to estimate the distance and orientation of a camera relative to a cone of known dimension.
+
+Why?
+- It's very easy to localize a cone and 4 key points in a scene.
+- A cone's pixel count is a function of distance and angle of inclination.
+- Short distances constrain the distance decision space.
+
+#### This approach is unreasonably simple, performant, and effective.
+
+This implementation cheats slightly. It focuses on best case segmentation. In reality, this approach is very sensitive to segmentation error. It's possible there exists advanced methods for segmenting a cone from a scene with extreme precision, but this is not the focus of this project.
 
 # I. Introduction
 
