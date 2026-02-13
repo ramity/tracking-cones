@@ -234,9 +234,11 @@ for render_id, render in enumerate(renders):
     # Save plot.
     plt.savefig(f"/data/query-results/{render}")
     # plt.savefig("/data/test.png")
+
+    plt.close(fig)
+    
     # import sys
     # sys.exit(0)
-    plt.close(fig)
 
     # Debug prints:
     # print("known angle:\t\t\t" + str(int(known_angle)))
