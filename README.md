@@ -4,61 +4,244 @@
 
 > A possibly misguided attempt at a camera positioning system using 3D printing, Blender, and Python.
 
-![alt text](docs/120-cone-contours.gif)
+# TOC
 
-# Cones
+- [I. Introduction](#i-introduction)
+  - [Background](#i-background)
+  - [Problem Statement](#i-problem-statement)
+  - [Proposed Solution](#i-proposed-solution)
+  - [Objectives](#i-objectives)
+- [II. Literature Review](#ii-literature-review)
+  - [Vision Based Navigation](#ii-vision-based-navigation)
+  - [Geometric Primitive Localization](#ii-geometric-primitive-localization)
+  - [PnP](#ii-pnp)
+- [III. Theoretical Framework & Mathematical Modeling](#iii-theoretical-framework--mathematical-modeling)
+  - [Conic Geometry in 3D Space](#iii-conic-geometry-in-3d-space)
+  - [The Camera Model](#iii-the-camera-model)
+  - [Image Segmentation](#iii-image-segmentation)
+  - [Pixel Count Analysis](#iii-pixel-count-analysis)
+  - [Angle Estimation](#iii-angle-estimation)
+  - [PNP Calculation](#iii-pnp-calculation)
+- [IV. Implementation](#iv-implementation)
+  - [Pixel Count Dataset](#iv-pixel-count-dataset)
+  - [Pixel Count Query Approach](#iv-pixel-count-query-approach)
+  - [Working Theory](#iv-working-theory)
+- [V. Results](#v-results)
+  - [Performance Analysis](#v-performance-analysis)
+- [VI. Future Work](#vi-future-work)
+- [VII. Setup](#vii-setup)
+- [VIII. Idea sketches](#viii-idea-sketches)
 
-In short, cones are pretty great for tracking. Right circular cones, specifically.
+# I. Introduction
 
-This work seems very novel, but I haven't seen it used anywhere else.
+## Background
 
-The key insights from this experiment are:
+The necessity of autonomous navigation in GPS-denied environments (deep space, lunar proximity).
+Photogrammetry.
+Problem of camera localization and environment mapping.
 
-1. The base of a cone is easy to localize and is always located at the left and right most contours.
+## Problem Statement
 
-Ability to:
+The challenge of estimating a 6-DOF camera pose using limited visual cues.
 
-- Calculate distance to camera using pixel distance between left and right most contours.
-- Calculate z angle of the camera relative to the base of a cone using the ratio of the major and minor axes of the ellipse fit to the base of the cone.
-- Calculate the rotational angle of the camera relative to the base of a cone using the angle of the major axis of the ellipse fit to the base of the cone.
+## Proposed Solution
 
-2. The tip of a cone is easy to localize and is always located at the top most contour.
+Utilizing a single known conical object as a navigational beacon by analyzing its projected pixel area and the observed angle of its apex/sides.
 
-- Provides a second value to calculate rotational pose of the camera relative to the cone/assumed shared plane in scene.
+## Objectives
 
----
+To derive a mathematical model for distance and orientation estimation based on conical projection.
 
-I learned that the cross-sectional area of the cone is proportional to the angle of the camera relative to the base of the cone. As the angle increases, the cross-sectional area decreases until 45 degrees. Cross-sectional area shrinks with angle increase as seen in the following charts.
+# II. Literature Review
 
-![alt text](docs/line_chart_by_distance.png)
+## Vision Based Navigation
 
-![alt text](docs/angle,distance,pixel-3d-graph.gif)
+Current state of star trackers and horizon sensors.
+AprilTags.
 
-![alt text](docs/80k-2.5k-spread-slice.gif)
+## Geometric Primitive Localization
 
-![alt text](docs/3d_surface_by_distance_slice_0.png)
-![alt text](docs/3d_surface_by_distance_slice_-90.png)
+Previous work on using spheres or cylinders for pose estimation.
 
-My research suggests that PnP would be a more robust solution for this problem, but I've continued this research out of curiosity.
+## PnP
 
-![alt text](/docs/area_dataset_subsection.gif)
+Previous work on using PnP for pose estimation.
+Mathematical foundations of projecting quadratic surfaces onto a 2D image plane.
 
-## Interresting observations
+# III. Theoretical Framework & Mathematical Modeling
 
-![alt text](docs/scatter_subset_-90.png)
+## Conic Geometry in 3D Space
 
-Showcases how pixel counts constrains distance. A pixel count of 70k ranges immediately constrains the distance to between 145mm to 175mm. It also 
+Defining the cone by its height (h), base radius (r), and semi-vertical angle (α).
 
-![alt text](docs/scatter_subset_0.png)
-![alt text](docs/3d_surface_scatter_b.gif)
+| Height | Radius | Base | Height | Slant Height |
+| --- | --- | --- | --- | --- |
+| 20mm | 10mm | 20mm | 20mm | 28.28mm |
 
-As distance increases, the pixel count ranges are less constrained.
+## The Camera Model
 
-![alt text](docs/105-1005-angle-distance-pixels.gif)
+Establishing the intrinsic matrix (K) and the transformation from world coordinates to the image plane.
 
-The dataset was expanded to cover distances 105mm to 1005mm, 900 distances, 67 angles, creating 61K+ data points of pixel counts.
+Photos are to be synethically generated using Blender.
 
-## Setup
+Focal length: 50mm
+Sensor size: 36mm x 20mm
+Image size: 1920px x 1080px
+
+### Camera matrix K:
+
+```
+K = [[fx, 0, cx], [0, fy, cy], [0, 0, 1]]
+```
+
+```
+fx = 50mm * (1920px / 36mm) = 2666.67px
+cx = 1920px / 2 = 960px
+fy = 50mm * (1080px / 20mm) = 2700px
+cy = 1080px / 2 = 540px
+```
+
+```
+K = [
+    [2666.67, 0, 960],
+    [0, 2700, 540],
+    [0, 0, 1]
+]
+```
+
+Distance coefficient [1, 1, 1, 1]
+
+## Image Segmentation
+
+Cone tip is the top most contour.
+Left most contour and right most contour are the base width of the cone.
+Center is midpoint between left and right of the base.
+Front is the bottom most contour.
+
+## Pixel Count Analysis
+
+Pixels within the cone contour are counted.
+
+## Angle Estimation
+
+Using the left, front, and right points, we can calculate the major and minor axes of the ellipse fit to the base of the cone.
+
+This values also enable the calculate the angle of inclindation of the camera's tilt relative to the cone’s base.
+
+## PNP Calculation
+
+3D values are provided for each of the 6 2D points
+- Top
+- Left
+- Right
+- Front
+- Back
+- Bottom
+
+And then combined to use the SOLVEPNP_ITERATIVE solver.
+
+The results are used to calculate the distance and the angle of inclination of the camera relative to the cone.
+
+# IV. Implementation
+
+## Pixel Count Dataset
+
+A 20mm by 20mm right circular cone was created using OnShape and exported as an .stl file.
+
+The cone was imported into Blender and rendered with a transparent background at distances of 105mm to 1005mm (1mm increments), 900 distances, 68 angles (0 to 67 degree increments), with focus on the base centerpoint, and created 61K+ data points of pixel counts.
+
+## Pixel Count Query Approach
+
+Angle of inclination is calculated:
+- using the major and minor axes of the ellipse fit to the base of the cone
+- using the angle of inclination calculated using PNP
+
+The two values are averaged and used as the query input angle.
+
+The query input angle and the pixel count are used to query the dataset for the expected distance.
+
+## Working Theory
+
+Angle of inclination of a cone can be calculated much more accurately than the distance alone. Use the angle of inclination to map and constrain the decision space of the query.
+
+A local space is queried and a distance is calculated based on the angle delta and the pixel count. This distance equation is applied to the local space and the value with the lowest distance is selected as the answer. The idea is to allow for a sort of fuzzy matching to allow some noise in the pixel count and angle delta.
+
+#### Input example:
+
+```
+Query input angle: 35 degrees
+Pixel count: 1000
+Pixel spread: 250px
+Angle spread: 10 degrees
+```
+
+Using the input angle, pixel count, pixel spread, and angle spread, the dataset is queried for the expected distance.
+
+#### Output covering 105mm to 999mm (1mm increments) at 35 degrees (static):
+
+![alt text](docs/input-query-chart-68-increment-zoom-4.gif)
+
+Here, we see the input and the decision space of the query. The inclination angle and tilt angle are shown in the top left. The pixel count is shown in the top right. The decision space is shown in the bottom left. The expected distance is shown in the bottom right.
+
+# V. Results
+
+## Dataset
+
+61269 1080p .png frames totaling 27.4 GB (26.4GB gzip level 9).
+
+Second order CSV created from traversing of the datapoints of the dataset:
+https://drive.google.com/file/d/14JnkB5_gfXsh9JslPNT_ygp9nTcKPcPc/view?usp=sharing
+
+Second order spreadsheet created from traversing of the datapoints of the dataset:
+https://docs.google.com/spreadsheets/d/1jAnREQOFrAC9bc6-9hUv07EDbun0gzWJSUG7m3Bfx1k/edit?usp=sharing
+
+## Figures
+
+FOV Shift Examples
+
+![Localization Example](docs/fov-shift-example.png)
+![Relative angle calculation](docs/relative-angle-calculation.png)
+
+Dataset visualization
+
+![Dataset visualization](docs/105-1005-angle-distance-pixels.gif)
+
+2D dataset visualizations
+
+![2d dataset visualization](docs/line_chart_by_distance.png)
+![2d dataset visualization](docs/pixel-count-bounds-distance.png)
+
+Subsection dataset visualizations
+
+![Constrained dataset visualization](docs/area_dataset_subsection.gif)
+![Subsection visualization](docs/3d_surface_scatter_b.gif)
+![Subsection visualization (higher zoom)](docs/80k-2.5k-spread-slice.gif)
+![Subsection visualization (higher zoom) scatter](docs/area-pixel-count-spread-slice-5000-pixels-100-spread-scatter.gif)
+
+## Performance Analysis
+
+#### Compared to pixel estimation and PNP, queried pixel count is more accurate 93% of the time.
+
+- A lot of this accounts to low degree angles of inclination being difficult to localize.
+
+#### The average distance and angle delta: 1.352mm, 0.484deg.
+
+- Across the entire dataset, the queried distance and angle were extremely accurate 
+
+#### Delta analysies
+
+![Delta analysis](docs/PNP,%20Pixel,%20Query%20Angle%20Delta%20Comparison.svg)
+![Delta analysis](docs/PNP,%20Pixel,%20Query%20Distance%20Delta%20Comparison.svg)
+
+# VI. Future Work
+
+#### Improvements to angle of inclination accuracy at low angles
+
+#### Performance analysis of impact of low angle inclination accuracy
+
+#### Improvements to pixel count accuracy
+
+# VII. Setup
 
 Install Docker
 
@@ -84,8 +267,31 @@ docker exec -it tracking_server bash
 python3 renders-to-gif.py
 ```
 
-## Idea sketches
+# VIII. Idea and stale visualizations
 
+![alt text](docs/3d_surface_by_distance_slice_0.png)
+![alt text](docs/3d_surface_by_distance_slice_-90.png)
+![alt text](docs/3d_surface_by_distance_slice_limited.png)
+![alt text](docs/3d_surface_by_distance_slice_limited_0.png)
+![alt text](docs/3d_surface_by_distance_slice_limited_0_b.png)
+![alt text](docs/3d_surface_scatter.gif)
+![alt text](docs/120-cone-contours.gif)
+![alt text](docs/400mm-surface-area-v-viewing-angle-trend-0-to-67-degrees.png)
+![alt text](docs/angle,distance,pixel-3d-graph.gif)
+![alt text](docs/area-pixel-count-spread-slice-5000-pixels-100-spread-lines.gif)
+![alt text](docs/distance-bounds-subset-animation.gif)
+![alt text](docs/distance-bounds-subset-animation-2.gif)
+![alt text](docs/distance-bounds-subset-animation-3.gif)
+![alt text](docs/distance-bounds-subset-animation-4.gif)
+![alt text](docs/distance-bounds-subset-animation-5.gif)
+![alt text](docs/input-query-chart-68-increment-distance-zoom-2.gif)
+![alt text](docs/input-query-chart-68-increment-distance-zoom-3.gif)
+![alt text](docs/input-query-chart-105-1005-35-degrees.gif)
+![alt text](docs/input-query-chart-305mm-0-67.gif)
+![alt text](docs/pixel-count-2670-100-bounds-distance.png)
+![alt text](docs/pixel-count-2694-100-bounds-distance.png)
+![alt text](docs/pixel-count-3066-100-bounds-distance.png)
+![alt text](docs/scatter_subset_0.png)
+![alt text](docs/scatter_subset_-90.png)
 ![alt text](docs/tracking-cone-diagram.png)
 ![alt text](docs/tracking-cone-diagram-localization.png)
-![alt text](docs/relative-angle-calculation.png)
