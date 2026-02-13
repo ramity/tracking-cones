@@ -28,6 +28,9 @@
   - [Pixel Count Query Approach](#pixel-count-query-approach)
   - [Working Theory](#working-theory)
 - [V. Results](#v-results)
+  - [Dataset](#dataset)
+  - [STL](#stl)
+  - [Figures](#figures)
   - [Performance Analysis](#performance-analysis)
 - [VI. Future Work](#vi-future-work)
 - [VII. Setup](#vii-setup)
@@ -230,6 +233,10 @@ https://drive.google.com/file/d/14JnkB5_gfXsh9JslPNT_ygp9nTcKPcPc/view?usp=shari
 
 Second order spreadsheet created from traversing of the datapoints of the dataset:
 https://docs.google.com/spreadsheets/d/1jAnREQOFrAC9bc6-9hUv07EDbun0gzWJSUG7m3Bfx1k/edit?usp=sharing
+
+## STL
+
+https://www.printables.com/model/1599008-tracking-cone
 
 ## Figures
 
