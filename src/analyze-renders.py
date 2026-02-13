@@ -22,10 +22,6 @@ output_csv_path = "/data/render_analysis.csv"
 
 renders = os.listdir(render_directory)
 
-# Fix to handle :03d vs :04d in filenames.
-# Sort renders by render_DISTANCE_ANGLE.png.
-renders.sort(key=lambda x: int(x.split('_')[1]))
-
 # renders = renders[47627:47671]
 
 # with open(output_csv_path, 'w', newline='') as csvfile:
@@ -49,7 +45,11 @@ renders.sort(key=lambda x: int(x.split('_')[1]))
 #         'closest_pixel_count'
 #     ])
 
-renders = renders[35:60895:68]
+renders = renders[35:61235:68]
+
+# Fix to handle :03d vs :04d in filenames.
+# Sort renders by render_DISTANCE_ANGLE.png.
+renders.sort(key=lambda x: int(x.split('_')[1]))
 
 for render_id, render in enumerate(renders):
 
@@ -208,8 +208,8 @@ for render_id, render in enumerate(renders):
 
     ax2.autoscale(enable=False, axis='x')
     ax2.autoscale(enable=False, axis='y')
-    min_distance = int(known_distance) - angle_spread
-    max_distance = int(known_distance) + angle_spread
+    min_distance = int(known_distance) - int(int(known_distance) * 0.05)
+    max_distance = int(known_distance) + int(int(known_distance) * 0.05)
     min_angle = int(known_angle) - angle_spread
     max_angle = int(known_angle) + angle_spread
 

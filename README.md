@@ -215,6 +215,7 @@ Using the input angle, pixel count, pixel spread, and angle spread, the dataset 
 #### Output covering 105mm to 999mm (1mm increments) at 35 degrees (static):
 
 ![alt text](docs/input-query-chart-68-increment-zoom-4.gif)
+![alt text](docs/input-query-chart-68-increment-distance-zoom-4.gif)
 
 Here we see the input and a subset of the decision space considered for the query.
 
