@@ -265,7 +265,7 @@ Subsection dataset visualizations
 
 #### IRL Video Results
 
-<video src="docs/irl-video-results.mp4" controls></video>
+<video src="docs/irl-video-results.mp4"></video>
 
 #### Compared to pixel estimation and PNP, queried pixel count is more accurate 93% of the time.
 
