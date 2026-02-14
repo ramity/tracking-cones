@@ -232,6 +232,8 @@ while cap.isOpened():
     closest_angle = results[closest_idx, 1]
     closest_pixel_count = results[closest_idx, 2]
 
+    cv2.putText(output, f"@{closest_angle}deg-{closest_distance}mm", (int(selected_contour[0][0][0]), int(selected_contour[0][0][1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+
     # Plot
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 18))
     fig.tight_layout()
