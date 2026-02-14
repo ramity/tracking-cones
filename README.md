@@ -265,8 +265,7 @@ Subsection dataset visualizations
 
 #### IRL Video Results
 
-<video controls>
-  <source src="https://github.com/ramity/tracking-cones/blob/master/docs/irl-video-results.mp4" type="video/mp4">
+<video controls src="https://github.com/ramity/tracking-cones/blob/master/docs/irl-video-results.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
