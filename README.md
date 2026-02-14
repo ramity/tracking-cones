@@ -267,6 +267,10 @@ Subsection dataset visualizations
 
 [Video](docs/irl-video-results.mp4)
 
+#### IRL Photo Results
+
+![alt text](docs/irl-results.gif)
+
 #### Compared to pixel estimation and PNP, queried pixel count is more accurate 93% of the time.
 
 - A lot of this accounts to low degree angles of inclination being difficult to localize.
