@@ -263,6 +263,13 @@ Subsection dataset visualizations
 
 ## Performance Analysis
 
+#### IRL Video Results
+
+<video controls>
+  <source src="https://github.com/ramity/tracking-cones/blob/master/docs/irl-video-results.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 #### Compared to pixel estimation and PNP, queried pixel count is more accurate 93% of the time.
 
 - A lot of this accounts to low degree angles of inclination being difficult to localize.
