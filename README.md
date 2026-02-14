@@ -267,6 +267,10 @@ Subsection dataset visualizations
 
 [Video](docs/irl-video-results.mp4)
 
+#### IRL Video Results Annotated
+
+[Video](docs/irl-video-results-angle-distance-annotated.mp4)
+
 #### IRL Photo Results
 
 ![alt text](docs/irl-results.gif)
