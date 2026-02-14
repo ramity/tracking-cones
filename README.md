@@ -265,9 +265,7 @@ Subsection dataset visualizations
 
 #### IRL Video Results
 
-<video controls src="https://github.com/ramity/tracking-cones/blob/master/docs/irl-video-results.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+<video src="docs/irl-video-results.mp4" controls></video>
 
 #### Compared to pixel estimation and PNP, queried pixel count is more accurate 93% of the time.
 
