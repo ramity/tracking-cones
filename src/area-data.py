@@ -3,7 +3,6 @@ import math
 import os
 
 STL_PATH = "/data/20mm Tracking Cone.stl"
-OUTPUT_PATH = "/data/area_data.csv"
 FOCAL_LENGTH = 50
 KNOWN_WIDTH = 20
 IMAGE_WIDTH = 1920

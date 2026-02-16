@@ -37,6 +37,7 @@ RUN ln -s /opt/blender-5.0.1-linux-x64/blender /usr/local/bin/blender
 RUN pip install numpy
 RUN pip install pillow
 RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cu130
+RUN pip install tqdm
 
 # OpenCV dependencies
 RUN apt install -y cmake g++ wget unzip

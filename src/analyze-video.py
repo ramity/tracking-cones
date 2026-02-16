@@ -5,6 +5,7 @@ import csv
 import matplotlib.pyplot as plt
 import math
 import sys
+import tqdm
 
 known_cone_width = 20
 known_cone_height = 20
@@ -27,8 +28,8 @@ output_video_path = "/data/irl-video-results.mp4"
 
 fps = 60
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-image_width = 1200
-image_height = 1800
+image_width = 1600
+image_height = 800
 out = cv2.VideoWriter(output_video_path, fourcc, fps, (image_width, image_height))
 
 # output_csv_path = "/data/render_analysis.csv"
@@ -60,7 +61,7 @@ out = cv2.VideoWriter(output_video_path, fourcc, fps, (image_width, image_height
 cap = cv2.VideoCapture(video_path)
 
 frame_count = 0
-while cap.isOpened():
+for _ in tqdm.tqdm(range(int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1)):
     ret, image = cap.read()
 
     if not ret:
@@ -70,9 +71,10 @@ while cap.isOpened():
     convert = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     # Convert to grayscale, threshold, and count white pixels.
-    output = np.zeros_like(image)
+    output_image = convert.copy()
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     ret, thresh = cv2.threshold(gray, 135, 255, 0)
+    query_image = np.zeros_like(thresh)
 
     # Find the contours of thresholded image.
     contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -86,13 +88,14 @@ while cap.isOpened():
     contours.sort(key=lambda x: (np.linalg.norm(np.mean(x, axis=0) - [center_x, center_y]), cv2.contourArea(x)))
 
     # for i, contour in enumerate(contours):
-    #     cv2.putText(output, str(i), (int(contour[0][0][0]), int(contour[0][0][1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-    #     cv2.drawContours(output, contour, -1, (255, 255, 255), 1)
-    # cv2.imwrite("/data/test.png", output)
+    #     cv2.putText(query_image, str(i), (int(contour[0][0][0]), int(contour[0][0][1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+    #     cv2.drawContours(query_image, contour, -1, (255, 255, 255), 1)
+    # cv2.imwrite("/data/test.png", query_image)
     # sys.exit()
 
     selected_contour = contours[0]
-    cv2.drawContours(output, [selected_contour], -1, (255, 255, 255), -1)
+    cv2.drawContours(query_image, [selected_contour], -1, 255, -1)
+    cv2.drawContours(output_image, [selected_contour], -1, (175, 255, 175), 2)
 
     # Definitions:
     # - Top is the apex of the cone.
@@ -158,16 +161,16 @@ while cap.isOpened():
     minor_axis = center_to_bottom_distance
 
     # Draw the top, bottom, left, right, and center points.
-    cv2.ellipse(output, (int(center[0]), int(center[1])), (int(major_axis), int(minor_axis)), 0, 0, 360, (255, 255, 255), 1)
-    white_pixels = np.sum(output == 255)
+    # cv2.ellipse(query_image, (int(center[0]), int(center[1])), (int(major_axis), int(minor_axis)), 0, 0, 360, 255, -1)
+    white_pixels = np.sum(query_image == 255)
 
-    cv2.circle(output, (int(top[0]), int(top[1])), 1, (0, 0, 255), -1)
-    cv2.circle(output, (int(bottom[0]), int(bottom[1])), 1, (0, 0, 255), -1)
-    cv2.circle(output, (int(left[0]), int(left[1])), 1, (255, 0, 0), -1)
-    cv2.circle(output, (int(right[0]), int(right[1])), 1, (255, 255, 0), -1)
-    cv2.circle(output, (int(center[0]), int(center[1])), 1, (0, 255, 255), -1)
-    cv2.circle(output, (int(back[0]), int(back[1])), 1, (255, 0, 255), -1)
-    # cv2.imwrite("/data/test.png", output)
+    cv2.circle(output_image, (int(top[0]), int(top[1])), 5, (0, 0, 255), -1)
+    cv2.circle(output_image, (int(bottom[0]), int(bottom[1])), 5, (0, 0, 255), -1)
+    cv2.circle(output_image, (int(left[0]), int(left[1])), 5, (255, 0, 0), -1)
+    cv2.circle(output_image, (int(right[0]), int(right[1])), 5, (255, 255, 0), -1)
+    cv2.circle(output_image, (int(center[0]), int(center[1])), 5, (0, 255, 255), -1)
+    cv2.circle(output_image, (int(back[0]), int(back[1])), 5, (255, 0, 255), -1)
+    # cv2.imwrite("/data/test.png", output_image)
 
     if major_axis == 0 or minor_axis == 0:
         print("Major or minor axis is zero. Cannot determine inclination angle.")
@@ -204,11 +207,9 @@ while cap.isOpened():
     data_area = data[:, 2]
 
     # Scale the pixel count to consider the image_width, render_width and image_height, render_height deltas.
-    scale_x = render_width / image_width
-    scale_y = render_height / image_height
-    white_pixels = white_pixels * scale_x * scale_y
-
-    print(white_pixels)
+    # scale_x = render_width / image_width
+    # scale_y = render_height / image_height
+    # white_pixels = white_pixels * scale_x * scale_y
 
     average_angle = np.mean([inclination_angle, tilt_angle])
     mask = (data_area >= white_pixels - pixel_spread) & (data_area <= white_pixels + pixel_spread) & (data_angle >= average_angle - angle_spread) & (data_angle <= average_angle + angle_spread)
@@ -224,18 +225,26 @@ while cap.isOpened():
     max_distance = results[np.argmax(results[:, 0])][0]
     min_angle = results[np.argmin(results[:, 1])][1]
     max_angle = results[np.argmax(results[:, 1])][1]
+    min_pixels = results[np.argmin(results[:, 2])][2]
+    max_pixels = results[np.argmax(results[:, 2])][2]
 
     # Find the result with the smallest difference in both angle and pixel count.
-    diff = np.sqrt((results[:, 1] - average_angle)**2 + (results[:, 2] - white_pixels)**2)
+    normalized_angles = (results[:, 1] - inclination_angle) * (max_angle / min_angle)
+    normalized_pixels = (results[:, 2] - white_pixels) * (max_pixels / min_pixels)
+    normalized_distance = (results[:, 0] - distance) * (max_distance / min_distance)
+    diff = np.sqrt(8 * (normalized_angles)**2 + (normalized_pixels)**2 + (normalized_distance)**2)
     closest_idx = np.argmin(diff)
     closest_distance = results[closest_idx, 0]
     closest_angle = results[closest_idx, 1]
     closest_pixel_count = results[closest_idx, 2]
 
-    cv2.putText(output, f"@{closest_angle}deg-{closest_distance}mm", (int(selected_contour[0][0][0]), int(selected_contour[0][0][1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+    cv2.putText(output_image, f"{white_pixels:06.0f}px / {closest_pixel_count:06.0f}px", (int(selected_contour[0][0][0]), int(selected_contour[0][0][1] - 300)), cv2.FONT_HERSHEY_SIMPLEX, 3, (50, 255, 50), 3)
+    cv2.putText(output_image, f"@{tilt_angle:05.1f}deg {pnp_distance:05.1f}mm PNP", (int(selected_contour[0][0][0]), int(selected_contour[0][0][1] - 200)), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 50), 3)
+    cv2.putText(output_image, f"@{inclination_angle:05.1f}deg {distance:05.1f}mm Pixel", (int(selected_contour[0][0][0]), int(selected_contour[0][0][1] - 100)), cv2.FONT_HERSHEY_SIMPLEX, 3, (50, 255, 255), 3)
+    cv2.putText(output_image, f"@{closest_angle:05.1f}deg {closest_distance:05.1f}mm Query", (int(selected_contour[0][0][0]), int(selected_contour[0][0][1])), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 50, 255), 3)
 
     # Plot
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 18))
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 8))
     fig.tight_layout()
 
     # Set ax1 to be the image.
@@ -246,14 +255,20 @@ while cap.isOpened():
     ax1.grid(True)
 
     # Set ax2 to be the output image.
-    ax2.imshow(output)
+    ax2.imshow(output_image)
     ax2.set_title("Output Image")
     ax2.set_xlabel("X")
     ax2.set_ylabel("Y")
-    ax2.grid(True)
+    # ax2.grid(True)
 
-    ax3.autoscale(enable=False, axis='x')
-    ax3.autoscale(enable=False, axis='y')
+    ax3.imshow(query_image, cmap='gray')
+    ax3.set_title("Query Image")
+    ax3.set_xlabel("X")
+    ax3.set_ylabel("Y")
+    # ax3.grid(True)
+
+    ax4.autoscale(enable=False, axis='x')
+    ax4.autoscale(enable=False, axis='y')
 
     # Update min_distance and max_distance to consider pixel and pnp approaches.
     min_distance = min(min_distance, distance, pnp_distance)
@@ -266,21 +281,21 @@ while cap.isOpened():
     min_angle -= 5
     max_angle += 5
 
-    scatter = ax3.scatter(results[:, 0], results[:, 1], c=results[:, 2], label='pixel_count', cmap='coolwarm')
-    fig.colorbar(scatter, ax=ax3, location='right', anchor=(0, 0), shrink=0.7)
-    ax3.plot([min_distance, max_distance], [inclination_angle, inclination_angle], label='inclination_angle', linestyle='-', color='orange', linewidth=1)
-    ax3.plot([distance, distance], [min_angle, max_angle], label='pixel_distance', linestyle='-', color='orange', linewidth=1)
-    ax3.plot([min_distance, max_distance], [tilt_angle, tilt_angle], label='tilt_angle', linestyle='-', color='blue', linewidth=1)
-    ax3.plot([pnp_distance, pnp_distance], [min_angle, max_angle], label='pnp_distance', linestyle='-', color='blue', linewidth=1)
-    ax3.plot([closest_distance, closest_distance], [min_angle, max_angle], label='queried_distance', linestyle='-', color='green')
-    ax3.plot([min_distance, max_distance], [closest_angle, closest_angle], label='queried_angle', linestyle='-', color='green')
-    ax3.set_xlabel("Distance (mm)")
-    ax3.set_ylabel("Angle (degrees)")
-    ax3.set_xlim([min_distance, max_distance])
-    ax3.set_ylim([min_angle, max_angle])
-    ax3.set_title(f"Pixel Count {white_pixels} pixel_spread {pixel_spread} angle_spread {angle_spread} bounds Distance")
-    ax3.legend(loc='lower right')
-    ax3.grid(True)
+    scatter = ax4.scatter(results[:, 0], results[:, 1], c=results[:, 2], label='pixel_count', cmap='coolwarm')
+    fig.colorbar(scatter, ax=ax4, location='right', anchor=(0, 0), shrink=0.7)
+    ax4.plot([min_distance, max_distance], [inclination_angle, inclination_angle], label='inclination_angle', linestyle='-', color='orange', linewidth=1)
+    ax4.plot([distance, distance], [min_angle, max_angle], label='pixel_distance', linestyle='-', color='orange', linewidth=1)
+    ax4.plot([min_distance, max_distance], [tilt_angle, tilt_angle], label='tilt_angle', linestyle='-', color='blue', linewidth=1)
+    ax4.plot([pnp_distance, pnp_distance], [min_angle, max_angle], label='pnp_distance', linestyle='-', color='blue', linewidth=1)
+    ax4.plot([closest_distance, closest_distance], [min_angle, max_angle], label='queried_distance', linestyle='-', color='green')
+    ax4.plot([min_distance, max_distance], [closest_angle, closest_angle], label='queried_angle', linestyle='-', color='green')
+    ax4.set_xlabel("Distance (mm)")
+    ax4.set_ylabel("Angle (degrees)")
+    ax4.set_xlim([min_distance, max_distance])
+    ax4.set_ylim([min_angle, max_angle])
+    ax4.set_title(f"Pixel Count {white_pixels} pixel_spread {pixel_spread} angle_spread {angle_spread} bounds Distance")
+    ax4.legend(loc='lower right')
+    ax4.grid(True)
 
     # Save plot.
     # plt.savefig(f"/data/irl-video-results/{frame_count}.png")
@@ -333,3 +348,5 @@ while cap.isOpened():
     # writer.writerow(row)
 
     frame_count += 1
+
+cap.release()
