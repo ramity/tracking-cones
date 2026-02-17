@@ -275,6 +275,12 @@ Subsection dataset visualizations
 
 ![alt text](docs/irl-results.gif)
 
+#### IRL Video YT Mirrors
+
+- ![1](https://youtu.be/Z-L18FFH4BM)
+- ![2](https://youtu.be/Bvpde57KV4I)
+- ![3](https://youtu.be/1ZVSewrq7vI)
+
 #### Compared to pixel estimation and PNP, queried pixel count is more accurate 93% of the time.
 
 - A lot of this accounts to low degree angles of inclination being difficult to localize.
