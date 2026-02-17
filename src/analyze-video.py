@@ -22,11 +22,11 @@ render_width = 1920
 render_height = 1080
 
 AREA_DATA_PATH = "/data/area_data.csv"
-video_path = "/data/20260213_222818.mp4"
+video_path = "/data/20260216_012521.mp4"
 
 output_video_path = "/data/irl-video-results.mp4"
 
-fps = 60
+fps = 30
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 image_width = 1600
 image_height = 800
@@ -73,27 +73,27 @@ for _ in tqdm.tqdm(range(int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1)):
     # Convert to grayscale, threshold, and count white pixels.
     output_image = convert.copy()
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    ret, thresh = cv2.threshold(gray, 135, 255, 0)
+    ret, thresh = cv2.threshold(gray, 165, 255, 0)
     query_image = np.zeros_like(thresh)
 
     # Find the contours of thresholded image.
     contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    valid_contours = [contour for contour in contours if cv2.contourArea(contour) > 500]
 
     # Sort contours in order of area.
-    contours = list(contours)
 
     # Sort contours by distance from center of image and then by area.
     center_x = image_width // 2
     center_y = image_height // 2
-    contours.sort(key=lambda x: (np.linalg.norm(np.mean(x, axis=0) - [center_x, center_y]), cv2.contourArea(x)))
+    valid_contours.sort(key=lambda x: (np.linalg.norm(np.mean(x, axis=0) - [center_x, center_y]), cv2.contourArea(x)))
 
-    # for i, contour in enumerate(contours):
+    # for i, contour in enumerate(valid_contours):
     #     cv2.putText(query_image, str(i), (int(contour[0][0][0]), int(contour[0][0][1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
     #     cv2.drawContours(query_image, contour, -1, (255, 255, 255), 1)
     # cv2.imwrite("/data/test.png", query_image)
     # sys.exit()
 
-    selected_contour = contours[0]
+    selected_contour = valid_contours[0]
     cv2.drawContours(query_image, [selected_contour], -1, 255, -1)
     cv2.drawContours(output_image, [selected_contour], -1, (175, 255, 175), 2)
 
@@ -300,9 +300,17 @@ for _ in tqdm.tqdm(range(int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1)):
     # Save plot.
     # plt.savefig(f"/data/irl-video-results/{frame_count}.png")
     plt.savefig("/data/test.png")
-    plt.close(fig)
-    temp = cv2.imread("/data/test.png")
+    # plt.close(fig)
+    # temp = cv2.imread("/data/test.png")
+    # out.write(temp)
+
+    # Instead of saving to /data/test.png
+    fig.canvas.draw()
+    temp = np.frombuffer(fig.canvas.buffer_rgba(), dtype=np.uint8)
+    temp = temp.reshape(fig.canvas.get_width_height()[::-1] + (4,))
+    temp = cv2.cvtColor(temp, cv2.COLOR_RGBA2BGR)
     out.write(temp)
+    plt.close(fig)
 
     # sys.exit(0)
 
@@ -350,3 +358,4 @@ for _ in tqdm.tqdm(range(int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1)):
     frame_count += 1
 
 cap.release()
+out.release()
